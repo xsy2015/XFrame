@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">XFrame</string>
+
+    <string name="home">home</string>
+    <string name="health_group">photo</string>
+    <string name="consult">group</string>
+    <string name="mall">mall</string>
+    <string name="personal_center">me</string>
+</resources>
