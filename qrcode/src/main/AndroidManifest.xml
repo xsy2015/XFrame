@@ -1,0 +1,9 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.xsy.qrcode">
+
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <application >
+        <activity android:name="com.xsy.qrcode.activity.ScanLifeActivity"
+            android:screenOrientation="portrait"/>
+    </application>
+</manifest>

@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/XFrame.iml" filepath="$PROJECT_DIR$/XFrame.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/base/base.iml" filepath="$PROJECT_DIR$/base/base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/qrcode/qrcode.iml" filepath="$PROJECT_DIR$/qrcode/qrcode.iml" />
       <module fileurl="file://$PROJECT_DIR$/xsy_widges/xsy_widges.iml" filepath="$PROJECT_DIR$/xsy_widges/xsy_widges.iml" />
     </modules>
   </component>

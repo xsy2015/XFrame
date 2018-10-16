@@ -1,1 +1,1 @@
-include ':app', ':base', ':xsy_widges'
+include ':app', ':base', ':xsy_widges', ':qrcode'

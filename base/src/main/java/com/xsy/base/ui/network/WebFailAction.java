@@ -1,6 +1,9 @@
 package com.xsy.base.ui.network;
 
+import android.text.TextUtils;
 import android.widget.Toast;
+
+import com.xsy.base.ui.utils.ToastUtils;
 
 import java.io.IOException;
 
@@ -27,7 +30,7 @@ public class WebFailAction implements Action1<Throwable> {
         } else {
             errorMsg = "unknown error";
         }
-        //Toast.makeToast(...);
+        ToastUtils.showLong(errorMsg);
     }
 
 }
