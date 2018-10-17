@@ -67,7 +67,7 @@ public class NewMallFragment extends BaseFragment {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             startActivity(new Intent(getContext(), ScanLifeActivity.class));
         }else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, 2015);
+            NewMallFragment.this.requestPermissions( new String[]{Manifest.permission.CAMERA}, 2015);
         }
     }
 
