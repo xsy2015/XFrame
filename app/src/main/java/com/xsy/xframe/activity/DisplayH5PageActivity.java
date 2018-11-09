@@ -1,20 +1,29 @@
-package com.xsy.base.ui.activity;
+package com.xsy.xframe.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.qmuiteam.qmui.widget.QMUITopBar;
 import com.qmuiteam.qmui.widget.QMUITopBarLayout;
+import com.tencent.sonic.sdk.SonicConfig;
+import com.tencent.sonic.sdk.SonicEngine;
+import com.tencent.sonic.sdk.SonicSession;
+import com.tencent.sonic.sdk.SonicSessionConfig;
 import com.xsy.base.R;
 import com.xsy.base.R2;
 import com.xsy.base.ui.BaseFragmentActivity;
 import com.xsy.base.ui.view.ProgressWebView;
+import com.xsy.xframe.view.sonicwebview.HostSonicRuntime;
+import com.xsy.xframe.view.sonicwebview.SonicJavaScriptInterface;
+import com.xsy.xframe.view.sonicwebview.SonicRuntimeImpl;
+import com.xsy.xframe.view.sonicwebview.SonicSessionClientImpl;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,6 +42,9 @@ public class DisplayH5PageActivity extends BaseFragmentActivity {
     QMUITopBarLayout mTopBar;
     private String url;
     private String titleName;
+    private SonicSession sonicSession;
+    private Intent intent;
+    private SonicSessionClientImpl sonicSessionClient = null;
 
     @Override
     public int getLayoutId() {
@@ -41,7 +53,26 @@ public class DisplayH5PageActivity extends BaseFragmentActivity {
 
     @Override
     public void afterBindView(Bundle savedInstanceState) {
+
+        intent = getIntent();
         initView();
+
+        // step 1: Initialize sonic engine if necessary
+        if (!SonicEngine.isGetInstanceAllowed()) {
+            SonicEngine.createInstance(new SonicRuntimeImpl(this), new SonicConfig.Builder().build());
+        }
+
+        // step 2: Create SonicSession
+        sonicSession = SonicEngine.getInstance().createSession(url,  new SonicSessionConfig.Builder().build());
+        if (null != sonicSession) {
+            sonicSession.bindClient(sonicSessionClient = new SonicSessionClientImpl());
+        } else {
+            // this only happen when a same sonic session is already running,
+            // u can comment following codes to feedback as a default mode.
+            throw new UnknownError("create session fail!");
+        }
+
+
         initWebView();
     }
 
@@ -88,6 +119,11 @@ public class DisplayH5PageActivity extends BaseFragmentActivity {
 
 //        webSettings.setDisplayZoomControls(false);
         webSettings.setJavaScriptEnabled(true); // 设置支持javascript脚本
+
+        mWebview.removeJavascriptInterface("searchBoxJavaBridge_");
+        intent.putExtra(SonicJavaScriptInterface.PARAM_LOAD_URL_TIME, System.currentTimeMillis());
+        mWebview.addJavascriptInterface(new SonicJavaScriptInterface(sonicSessionClient, intent), "sonic");
+
         webSettings.setAllowFileAccess(true); // 允许访问文件
         webSettings.setBuiltInZoomControls(false); // 设置显示缩放按钮
         webSettings.setSupportZoom(false); // 支持缩放
@@ -108,6 +144,9 @@ public class DisplayH5PageActivity extends BaseFragmentActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 //LogUtil.d(TAG, "onPageFinished");
+                if (sonicSession != null) {
+                    sonicSession.getSessionClient().pageFinish(url);
+                }
             }
 
             @Override
@@ -115,7 +154,32 @@ public class DisplayH5PageActivity extends BaseFragmentActivity {
                 super.onReceivedError(view, errorCode, description, failingUrl);
                 //LogUtil.e(TAG, "onReceivedError");
             }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                if (sonicSession != null) {
+                    //step 6: Call sessionClient.requestResource when host allow the application
+                    // to return the local data .
+                    return (WebResourceResponse) sonicSession.getSessionClient().requestResource(url);
+                }
+                return null;
+            }
         });
-        mWebview.loadUrl(url);
+        // step 5: webview is ready now, just tell session client to bind
+        if (sonicSessionClient != null) {
+            sonicSessionClient.bindWebView(mWebview);
+            sonicSessionClient.clientReady();
+        } else { // default mode
+            mWebview.loadUrl(url);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (null != sonicSession) {
+            sonicSession.destroy();
+            sonicSession = null;
+        }
+        super.onDestroy();
     }
 }

@@ -18,6 +18,8 @@ import com.xsy.base.ui.network.WebFailAction;
 import com.xsy.base.ui.network.WebSuccessAction;
 import com.xsy.xframe.R;
 import com.xsy.xframe.adapter.TizhiListAdpter;
+import com.xsy.xframe.bean.ArticleListBean;
+import com.xsy.xframe.bean.BannerBean;
 import com.xsy.xframe.bean.NewsBean;
 import com.xsy.xframe.network.DrakeetFactory;
 import com.xsy.xframe.network.GankApi;
@@ -66,18 +68,18 @@ public class HealthGroupFragment extends BaseFragment {
 
     private void initView() {
         GankApi gankApi = DrakeetFactory.getGankIOSingleton();
-        gankApi.getNewsList2("1", "10")
-                .compose(RxUtil.<JsonDataResponse<List<NewsBean.DataBean>>>normalSchedulers())
-                .subscribe(new WebSuccessAction<JsonDataResponse<List<NewsBean.DataBean>>>() {
+        gankApi.getBannerList()
+                .compose(RxUtil.<JsonDataResponse<List<BannerBean.DataBean>>>normalSchedulers())
+                .subscribe(new WebSuccessAction<JsonDataResponse<List<BannerBean.DataBean>>>() {
                     @Override
-                    public void onSuccess(JsonDataResponse<List<NewsBean.DataBean>> response) {
+                    public void onSuccess(JsonDataResponse<List<BannerBean.DataBean>> response) {
                         LogUtils.i(TAG,"data="+response.getData());
                         updateUI(response);
                     }
                 }, new WebFailAction());
     }
 
-    private void updateUI(JsonDataResponse<List<NewsBean.DataBean>> datas) {
+    private void updateUI(JsonDataResponse<List<BannerBean.DataBean>> datas) {
         news_banner.setPages(datas.getData(), new MZHolderCreator<NewBannerViewHolder>() {
 
             @Override
@@ -87,7 +89,7 @@ public class HealthGroupFragment extends BaseFragment {
         });
     }
 
-    class NewBannerViewHolder implements MZViewHolder<NewsBean.DataBean> {
+    class NewBannerViewHolder implements MZViewHolder<BannerBean.DataBean> {
 
         private ImageView iv_news;
         private TextView tv_title_news;
@@ -104,11 +106,10 @@ public class HealthGroupFragment extends BaseFragment {
         }
 
         @Override
-        public void onBind(Context context, int position, NewsBean.DataBean dataBean) {
+        public void onBind(Context context, int position, BannerBean.DataBean dataBean) {
             if (dataBean != null) {
-                Glide.with(context).load(dataBean.getMainImage()).into((iv_news));
+                Glide.with(context).load(dataBean.getImagePath()).into((iv_news));
                 tv_title_news.setText(dataBean.getTitle());
-
             }
         }
     }

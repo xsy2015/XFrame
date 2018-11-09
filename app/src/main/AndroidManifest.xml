@@ -23,7 +23,7 @@
         </activity>
         <activity android:name=".activity.ChildItemActivity"
                   android:screenOrientation="portrait"/>
-        <activity android:name="com.xsy.base.ui.activity.DisplayH5PageActivity"
+        <activity android:name=".activity.DisplayH5PageActivity"
             android:screenOrientation="portrait"/>
 
     </application>

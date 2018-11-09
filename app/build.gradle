@@ -39,4 +39,6 @@ dependencies {
     compile 'com.jakewharton:butterknife:8.8.1'
     apt 'com.jakewharton:butterknife-compiler:8.8.1'
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
+    compile 'com.tencent.sonic:sdk:3.0.0'
+    compile 'com.scwang.smartrefresh:SmartRefreshLayout:1.1.0-alpha-14'
 }

@@ -37,7 +37,7 @@ import rx.schedulers.Schedulers;
  */
 public class DrakeetRetrofit {
 
-    public static final String BASE_URL = "http://www.jkbat.com";
+    public static final String BASE_URL = "http://www.wanandroid.com";//http://www.jkbat.com"
 
     final GankApi gankService;
     // @formatter:off

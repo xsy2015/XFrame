@@ -1,20 +1,27 @@
 package com.xsy.xframe.fragment;
 
-import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.HorizontalScrollView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.qmuiteam.qmui.widget.QMUICollapsingTopBarLayout;
 import com.qmuiteam.qmui.widget.QMUITopBar;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
 import com.xsy.base.ui.BaseFragment;
-import com.xsy.base.ui.activity.DisplayH5PageActivity;
+import com.xsy.base.ui.network.JsonDataResponse;
+import com.xsy.base.ui.network.RxUtil;
+import com.xsy.base.ui.network.WebFailAction;
+import com.xsy.base.ui.network.WebSuccessAction;
+import com.xsy.xframe.activity.DisplayH5PageActivity;
 import com.xsy.xframe.R;
 import com.xsy.xframe.adapter.NewsListAdapter;
+import com.xsy.xframe.bean.ArticleListBean;
 import com.xsy.xframe.bean.NewsBean;
 import com.xsy.xframe.network.DrakeetFactory;
 import com.xsy.xframe.network.GankApi;
@@ -42,9 +49,14 @@ public class HomeFragment extends BaseFragment {
     QMUITopBar mTopBar;
     @BindView(R.id.recyclerView)
     RecyclerView mRecyclerView;
+    @BindView(R.id.refreshLayout)
+    SmartRefreshLayout refreshLayout;
 
     private List<NewsBean.DataBean> newsData = new ArrayList<>();
+    private List<ArticleListBean.DataBean.DatasBean> articlesData = new ArrayList<>();
     private NewsListAdapter adapter;
+    private int pageIndex = 0;
+    private int pageSize = 10;
 
     @Override
     public int getLayoutId() {
@@ -66,11 +78,33 @@ public class HomeFragment extends BaseFragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        adapter = new NewsListAdapter(R.layout.item_health_consult, newsData, getContext());
+        adapter = new NewsListAdapter(R.layout.item_article_list, articlesData, getContext());
         mRecyclerView.setAdapter(adapter);
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
 
+        refreshLayout.setOnRefreshListener(new com.scwang.smartrefresh.layout.listener.OnRefreshListener() {
+            @Override
+            public void onRefresh(@NonNull RefreshLayout refreshLayout) {
+                pageIndex=0;
+                getArticleList(true);
+                refreshLayout.finishRefresh(2000);
+            }
+        });
+        refreshLayout.setOnLoadMoreListener(new com.scwang.smartrefresh.layout.listener.OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(@NonNull RefreshLayout refreshLayout) {
+                pageIndex+=1;
+                getArticleList(false);
+                refreshLayout.finishLoadMore(2000);
+            }
+        });
+
+        getArticleList(true);
+    }
+
+    private void getArticleList(final boolean refresh) {
         GankApi gankApi = DrakeetFactory.getGankIOSingleton();
-        gankApi.getNewsList("1", "10")
+       /* gankApi.getNewsList("1", "10")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<NewsBean>() {
@@ -83,7 +117,22 @@ public class HomeFragment extends BaseFragment {
                         newsData.addAll(newsBean.getData());
                         adapter.notifyDataSetChanged();
                     }
-                });
+                });*/
+
+        gankApi.getArticleList(pageIndex+"",pageSize+"")
+                .compose(RxUtil.<JsonDataResponse<ArticleListBean.DataBean>>normalSchedulers())
+                .subscribe(new WebSuccessAction<JsonDataResponse<ArticleListBean.DataBean>>() {
+                    @Override
+                    public void onSuccess(JsonDataResponse<ArticleListBean.DataBean> extendedResponse) {
+                        if (refresh) {
+                            if (articlesData != null) {
+                                articlesData.clear();
+                            }
+                        }
+                        articlesData.addAll(extendedResponse.getData().getDatas());
+                        adapter.notifyDataSetChanged();
+                    }
+                },new WebFailAction());
     }
 
     private void initEvent() {
@@ -91,8 +140,8 @@ public class HomeFragment extends BaseFragment {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Intent intent = new Intent(getActivity(), DisplayH5PageActivity.class);
-                intent.putExtra("url", "http://www.jkbat.com/App/NewsDetail/" + newsData.get(position).getID());
-                intent.putExtra("titleName", "资讯详情");
+                intent.putExtra("url", articlesData.get(position).getLink());
+                intent.putExtra("titleName", articlesData.get(position).getTitle());
                 startActivity(intent);
             }
         });

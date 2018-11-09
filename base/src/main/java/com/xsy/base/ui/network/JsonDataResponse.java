@@ -15,7 +15,7 @@ public class JsonDataResponse<T> {
     @SerializedName("ResultMessage")
     private String msg;
 
-    @SerializedName("Data")
+    @SerializedName("data")
     T data;
 
     public int getRc() { return rc; }

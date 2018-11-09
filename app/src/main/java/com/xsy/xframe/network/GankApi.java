@@ -20,6 +20,8 @@
 package com.xsy.xframe.network;
 
 import com.xsy.base.ui.network.JsonDataResponse;
+import com.xsy.xframe.bean.ArticleListBean;
+import com.xsy.xframe.bean.BannerBean;
 import com.xsy.xframe.bean.NewsBean;
 
 import java.util.List;
@@ -57,5 +59,11 @@ public interface GankApi {
             @Query("pageIndex") String pageIndex,
             @Query("pageSize") String pageSize
     );
-
+    @GET("/article/list/1/json")
+    Observable<JsonDataResponse<ArticleListBean.DataBean>> getArticleList(
+            @Query("curPage") String pageIndex,
+            @Query("size") String pageSize
+    );
+    @GET("/banner/json")
+    Observable<JsonDataResponse<List<BannerBean.DataBean>>> getBannerList();
 }

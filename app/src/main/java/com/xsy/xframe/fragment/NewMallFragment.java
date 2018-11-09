@@ -35,7 +35,7 @@ import butterknife.OnClick;
 
 /**
  * @Description描述:
- * @Author作者: xuesanyang
+ * @Author作者: xsy
  * @Date日期: 2016/10/10
  */
 public class NewMallFragment extends BaseFragment {
