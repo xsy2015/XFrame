@@ -14,7 +14,11 @@ import com.scwang.smartrefresh.layout.header.ClassicsHeader;
 import com.tencent.sonic.sdk.SonicConfig;
 import com.tencent.sonic.sdk.SonicEngine;
 import com.xsy.base.ui.BaseApplication;
+import com.xsy.xframe.db.DaoMaster;
+import com.xsy.xframe.db.DaoSession;
 import com.xsy.xframe.view.sonicwebview.HostSonicRuntime;
+
+import org.greenrobot.greendao.database.Database;
 
 /**
  * @Description描述:
@@ -23,7 +27,7 @@ import com.xsy.xframe.view.sonicwebview.HostSonicRuntime;
  */
 
 public class XAplication extends BaseApplication {
-
+    private DaoSession daoSession;
     static {
         //设置全局的Header构建器
         SmartRefreshLayout.setDefaultRefreshHeaderCreator(new DefaultRefreshHeaderCreator() {
@@ -46,5 +50,14 @@ public class XAplication extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        // regular SQLite database
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "notes-db");
+        Database db = helper.getWritableDb();
+        daoSession = new DaoMaster(db).newSession();
+    }
+
+    public DaoSession getDaoSession() {
+        return daoSession;
     }
 }

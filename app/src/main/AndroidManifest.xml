@@ -25,7 +25,8 @@
                   android:screenOrientation="portrait"/>
         <activity android:name=".activity.DisplayH5PageActivity"
             android:screenOrientation="portrait"/>
-
+        <activity android:name=".activity.AddNewNoteActivity"
+                  android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

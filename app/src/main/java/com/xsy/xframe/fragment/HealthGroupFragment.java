@@ -1,6 +1,7 @@
 package com.xsy.xframe.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.view.Gravity;
@@ -17,6 +18,7 @@ import com.xsy.base.ui.network.RxUtil;
 import com.xsy.base.ui.network.WebFailAction;
 import com.xsy.base.ui.network.WebSuccessAction;
 import com.xsy.xframe.R;
+import com.xsy.xframe.activity.DisplayH5PageActivity;
 import com.xsy.xframe.adapter.TizhiListAdpter;
 import com.xsy.xframe.bean.ArticleListBean;
 import com.xsy.xframe.bean.BannerBean;
@@ -28,6 +30,7 @@ import com.xsy.xsy_widges.viewpager.MZBannerView;
 import com.xsy.xsy_widges.viewpager.MZHolderCreator;
 import com.xsy.xsy_widges.viewpager.MZViewHolder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -39,13 +42,15 @@ import rx.functions.Action1;
  * @Author作者: xuesanyang
  * @Date日期: 2016/10/10
  */
-public class HealthGroupFragment extends BaseFragment {
+public class HealthGroupFragment extends BaseFragment{
 
     private static final java.lang.String TAG = "HealthGroupFragment";
     @BindView(R.id.topbar)
     QMUITopBarLayout mTopBar;
     @BindView(R.id.news_banner)
     MZBannerView news_banner;
+    List<BannerBean.DataBean> mData=new ArrayList();
+
     public static HealthGroupFragment newInstance() {
         Bundle args = new Bundle();
         HealthGroupFragment fragment = new HealthGroupFragment();
@@ -74,6 +79,7 @@ public class HealthGroupFragment extends BaseFragment {
                     @Override
                     public void onSuccess(JsonDataResponse<List<BannerBean.DataBean>> response) {
                         LogUtils.i(TAG,"data="+response.getData());
+                        mData.addAll(response.getData());
                         updateUI(response);
                     }
                 }, new WebFailAction());
@@ -106,11 +112,21 @@ public class HealthGroupFragment extends BaseFragment {
         }
 
         @Override
-        public void onBind(Context context, int position, BannerBean.DataBean dataBean) {
+        public void onBind(Context context, int position, final BannerBean.DataBean dataBean) {
             if (dataBean != null) {
                 Glide.with(context).load(dataBean.getImagePath()).into((iv_news));
                 tv_title_news.setText(dataBean.getTitle());
             }
+
+            card_view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(getActivity(), DisplayH5PageActivity.class);
+                    intent.putExtra("url", dataBean.getUrl());
+                    intent.putExtra("titleName", dataBean.getTitle());
+                    startActivity(intent);
+                }
+            });
         }
     }
 }

@@ -125,8 +125,8 @@ public class DisplayH5PageActivity extends BaseFragmentActivity {
         mWebview.addJavascriptInterface(new SonicJavaScriptInterface(sonicSessionClient, intent), "sonic");
 
         webSettings.setAllowFileAccess(true); // 允许访问文件
-        webSettings.setBuiltInZoomControls(false); // 设置显示缩放按钮
-        webSettings.setSupportZoom(false); // 支持缩放
+        webSettings.setBuiltInZoomControls(true); // 设置显示缩放按钮
+        webSettings.setSupportZoom(true); // 支持缩放
         webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
